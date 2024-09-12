@@ -1,0 +1,36 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.SacrenaChat" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/col_272727</item>
+        <item name="colorPrimaryVariant">@color/col_272727</item>
+        <item name="colorOnPrimary">@color/col_272727</item>
+        <item name="android:windowBackground">@color/col_272727</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="txtR15sdp" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/lucidagrande</item>
+        <item name="android:textSize">@dimen/_15sdp</item>
+        <item name="android:textColor">@color/col_FFFFFFFF</item>
+        <item name="android:spacing">5dp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="txtB15sdp" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/lucidagrandebold</item>
+        <item name="android:textSize">@dimen/_15sdp</item>
+        <item name="android:textColor">@color/col_FFFFFFFF</item>
+        <item name="android:spacing">5dp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <!--<style name="txtL15sdp" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/lucidagrandebold</item>
+        <item name="android:textSize">@dimen/_15sdp</item>
+        <item name="android:textColor">@color/col_FFFFFFFF</item>
+    </style>-->
+
+</resources>

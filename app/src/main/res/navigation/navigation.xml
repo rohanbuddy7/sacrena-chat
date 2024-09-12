@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/channelFragment">
+
+    <fragment
+        android:id="@+id/channelFragment"
+        android:name="com.rohans.sacrenachat.ui.channel.ChannelFragment"
+        tools:layout="@layout/fragment_channel"
+        android:label="fragment_channel"/>
+
+    <fragment
+        android:id="@+id/messageFragment"
+        android:name="com.rohans.sacrenachat.ui.message.MessageFragment"
+        tools:layout="@layout/fragment_message"
+        android:label="fragment_message"/>
+
+</navigation>

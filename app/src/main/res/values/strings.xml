@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Sacrena Chat</string>
+    <string name="connections">Connections</string>
+    <string name="this_is_the_begining_of_your_conversation">This is the begining of your conversation.</string>
+</resources>

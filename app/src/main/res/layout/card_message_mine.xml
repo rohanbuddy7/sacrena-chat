@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:bind="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="data"
+            type="io.getstream.chat.android.models.Message" />
+    </data>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:gravity="end"
+        android:background="@color/col_272727">
+
+        <include
+            android:id="@+id/layout_date_mine"
+            layout="@layout/card_date"
+            app:data="@{data}"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/_100sdp"
+            android:layout_marginStart="@dimen/_60sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:orientation="vertical"
+                android:gravity="end"
+                android:padding="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_message_mine">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{data.text}"
+                    style="@style/txtR15sdp"
+                    android:textSize="@dimen/_11sdp"
+                    android:textColor="@color/col_525252"
+                    android:lineSpacingExtra="5dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:gravity="end"
+                    app:timeFromDate="@{data.updatedAt}"
+                    style="@style/txtR15sdp"
+                    android:textSize="@dimen/_8sdp"
+                    android:textColor="@color/col_525252"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

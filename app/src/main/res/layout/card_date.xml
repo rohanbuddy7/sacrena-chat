@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="data"
+            type="io.getstream.chat.android.models.Message" />
+    </data>
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:cardCornerRadius="@dimen/_20sdp"
+        android:layout_margin="@dimen/_10sdp"
+        android:backgroundTint="@color/col_272727">
+
+        <TextView
+            style="@style/txtB15sdp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_date"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:paddingVertical="@dimen/_3sdp"
+            android:textAllCaps="true"
+            android:textColor="@color/col_525252"
+            android:textSize="@dimen/_7sdp"
+            app:dayFromDate="@{data.updatedAt}" />
+
+    </com.google.android.material.card.MaterialCardView>
+</layout>
