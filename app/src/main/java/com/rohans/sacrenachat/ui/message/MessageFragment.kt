@@ -1,21 +1,22 @@
 package com.rohans.sacrenachat.ui.message
 
 import android.content.Intent
-import android.graphics.Camera
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import androidx.core.widget.NestedScrollView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.loannetwork.app.ui.billingCompany.bottomsheets.state.MessageAdapter
 import com.rohans.sacrenachat.R
@@ -32,11 +33,14 @@ class MessageFragment: Fragment() {
     private var hasNext: Boolean = false;
     private var lastMessage: Message? = null
     private lateinit var adapter: MessageAdapter
-    val pageSize = 20
+    val pageSize = 9
+    private var tempLastMessage: Message? = null
 
     @Inject
     lateinit var chatClient: ChatClient
     private var channelId: String? = null
+    private var cName: String? = null
+    private var cImage: String? = null
     lateinit var binding: FragmentMessageBinding
     val viewModel by viewModels<MessageViewModel>()
 
@@ -52,13 +56,23 @@ class MessageFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         channelId = arguments?.getString("channelId");
+        cName = arguments?.getString("cName");
+        cImage = arguments?.getString("cImage");
+        binding.cName = cName;
+        binding.cImage = cImage;
+
         setUp();
         observers();
     }
 
     private fun setUp(){
         adapter = MessageAdapter(requireContext(), arrayListOf(), this::clicked);
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
+        layoutManager.stackFromEnd = false
+        binding.rvMessage.setLayoutManager(layoutManager)
         binding.rvMessage.adapter = adapter;
+        binding.nestedScroll.setOnScrollChangeListener(listener);
+        binding.rvMessage.isNestedScrollingEnabled = true;
         textChanges();
 
         channelId?.let {
@@ -96,12 +110,13 @@ class MessageFragment: Fragment() {
         viewModel.message.observe(viewLifecycleOwner, Observer {
             hasNext = it.hasNext;
             adapter.addData(it.messages);
-            binding.data = it.messages.firstOrNull();
             if(lastMessage==null) {
                 scrollToBottom();
+            } else {
+                scrollToBottomItem();
             }
             zeroState();
-            lastMessage = it.messages.firstOrNull();
+            lastMessage = it.messages.lastOrNull();
         })
 
         viewModel.newMessage.observe(viewLifecycleOwner, Observer {
@@ -110,28 +125,46 @@ class MessageFragment: Fragment() {
             zeroState();
         })
 
-        binding.rvMessage.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+    }
 
-                if (firstVisibleItemPosition == 0 && hasNext) {
+    var listener = object : NestedScrollView.OnScrollChangeListener{
+        override fun onScrollChange(
+            v: NestedScrollView,
+            scrollX: Int,
+            scrollY: Int,
+            oldScrollX: Int,
+            oldScrollY: Int
+        ) {
+            if (scrollY == 0) {
+                if (hasNext && lastMessage?.id!=tempLastMessage?.id ) {
                     channelId?.let {
                         lastMessage?.let {
+                            tempLastMessage = lastMessage!!;
                             viewModel.getNexMessage(channelId!!, lastMessage!!, pageSize)
                         }
                     }
                 }
             }
-        })
+        }
+    }
 
+    private fun scrollToBottomItem(){
+        val hide = 6;
+        val lastPosition = (binding.rvMessage.adapter?.itemCount?:0) - (pageSize-hide);
+        binding.rvMessage.post {
+            val y = binding.rvMessage.getChildAt(lastPosition).getY();
+            binding.nestedScroll.post {
+                binding.nestedScroll.fling(0)
+                binding.nestedScroll.smoothScrollTo(0, y.toInt())
+            }
+        }
     }
 
     private fun scrollToBottom(){
-        val lastPosition = binding.rvMessage.adapter!!.itemCount
         binding.rvMessage.post {
-            binding.rvMessage.smoothScrollToPosition(lastPosition)
+            binding.nestedScroll.post {
+                binding.nestedScroll.smoothScrollTo(0, binding.nestedScroll.getChildAt(0).bottom)
+            }
         }
     }
 

@@ -13,8 +13,10 @@ import com.loannetwork.app.ui.billingCompany.bottomsheets.state.ChannelAdapter
 import com.rohans.sacrenachat.R
 import com.rohans.sacrenachat.databinding.FragmentChannelBinding
 import com.rohans.sacrenachat.model.CustomChannel
+import com.rohans.sacrenachat.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.client.extensions.internal.users
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -63,6 +65,8 @@ class ChannelFragment: Fragment() {
     private fun clicked(customChannel: CustomChannel){
         val bundle = Bundle();
         bundle.putString("channelId", customChannel.channel.id)
+        bundle.putString("cName", customChannel.channel.members.filter { it.user.id != Constants.aliceUserId }.firstOrNull()?.user?.name)
+        bundle.putString("cImage", customChannel.channel.members.filter { it.user.id != Constants.aliceUserId }.firstOrNull()?.user?.image)
         findNavController().navigate(R.id.messageFragment, bundle);
     }
 

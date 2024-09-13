@@ -4,8 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
-            name="data"
-            type="io.getstream.chat.android.models.Message" />
+            name="cName"
+            type="String" />
+        <variable
+            name="cImage"
+            type="String" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,7 +49,7 @@
                         android:id="@+id/iv_chat_pic"
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="@dimen/_40sdp"
-                        app:imageUrl="@{data.user.image}"
+                        app:imageUrl="@{cImage}"
                         android:scaleType="centerCrop"/>
 
                 </com.google.android.material.card.MaterialCardView>
@@ -56,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="@dimen/_10sdp"
-                    android:text="@{data.user.name}"
+                    android:text="@{cName}"
                     style="@style/txtB15sdp"/>
 
                 <ImageView
@@ -90,14 +93,24 @@
                 android:gravity="center"
                 android:textColor="@color/col_AAAAAA"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_message"
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nestedScroll"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/card_message_mine"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="5"/>
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:listitem="@layout/card_message_mine"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="5"
+                    /><!--android:descendantFocusability="blocksDescendants"-->
+
+            </androidx.core.widget.NestedScrollView>
 
         </LinearLayout>
 

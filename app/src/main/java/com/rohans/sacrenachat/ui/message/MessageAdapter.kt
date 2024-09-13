@@ -54,6 +54,7 @@ class MessageAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        //holder.setIsRecyclable(false)
         var showdate = false;
         if(previousDate?.date != list[position].updatedAt?.date){
             previousDate = list[position].updatedAt;
@@ -89,9 +90,9 @@ class MessageAdapter(
 
     fun addData(data: List<Message>) {
         val prev = list.size
-        list.addAll( 0, data);
-        //notifyItemRangeChanged(0, prev);
-        notifyDataSetChanged();
+        list.addAll(data);
+        notifyItemRangeChanged(prev, list.size);
+        //notifyDataSetChanged();
     }
 
     fun addNewData(data: Message) {
