@@ -18,7 +18,7 @@ import java.util.Date
 class MessageAdapter(
     private var context: Context,
     private var list: ArrayList<Message>,
-    private var clicked: (Message)->Unit
+    private var imageClicked: (Message)->Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var previousDate: Date? = null;
@@ -70,6 +70,10 @@ class MessageAdapter(
                 } else {
                     holder.binding.layoutDateMine.cardView.visibility = View.GONE
                 }
+
+                holder.binding.ivImage.setOnClickListener {
+                    imageClicked.invoke(data)
+                }
             }
             is ViewHolderOther->{
                 val data = list[position]
@@ -80,8 +84,13 @@ class MessageAdapter(
                 } else {
                     holder.binding.layoutDateOther.cardView.visibility = View.GONE
                 }
+
+                holder.binding.ivImage.setOnClickListener {
+                    imageClicked.invoke(data)
+                }
             }
         }
+
     }
 
     override fun getItemCount(): Int {
@@ -91,12 +100,12 @@ class MessageAdapter(
     fun addData(data: List<Message>) {
         val prev = list.size
         list.addAll(data);
-        notifyItemRangeChanged(prev, list.size);
+        notifyItemRangeInserted(prev, list.size);
         //notifyDataSetChanged();
     }
 
     fun addNewData(data: Message) {
-        list.add(data);
-        notifyItemChanged(list.size)
+        list.add(0, data);
+        notifyItemInserted(0)
     }
 }

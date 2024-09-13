@@ -6,6 +6,7 @@
         <item name="colorPrimaryVariant">@color/col_272727</item>
         <item name="colorOnPrimary">@color/col_272727</item>
         <item name="android:windowBackground">@color/col_272727</item>
+        <item name="colorSecondary">@color/col_AAAAAA</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->

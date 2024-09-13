@@ -58,14 +58,13 @@
                     android:id="@+id/tv_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{data.channel.createdBy.name}"
                     style="@style/txtB15sdp"/>
 
                 <TextView
                     android:id="@+id/tv_msg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text='@{data.lastMessage.text}'
+                    android:maxLines="2"
                     style="@style/txtR15sdp"
                     android:textSize="@dimen/_11sdp"
                     android:textColor="@color/col_AAAAAA"/>

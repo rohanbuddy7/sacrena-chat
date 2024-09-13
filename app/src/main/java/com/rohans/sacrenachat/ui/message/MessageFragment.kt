@@ -1,15 +1,19 @@
 package com.rohans.sacrenachat.ui.message
 
+import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.core.widget.NestedScrollView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -21,15 +25,21 @@ import com.bumptech.glide.Glide
 import com.loannetwork.app.ui.billingCompany.bottomsheets.state.MessageAdapter
 import com.rohans.sacrenachat.R
 import com.rohans.sacrenachat.databinding.FragmentMessageBinding
+import com.rohans.sacrenachat.ui.fullscreen.FullScreenActivity
+import com.rohans.sacrenachat.utils.CameraHelper
 import com.rohans.sacrenachat.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.Message
+import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MessageFragment: Fragment() {
 
+    private var photoFile: File? = null;
+    private lateinit var cameraResult: ActivityResultLauncher<Intent>
     private var hasNext: Boolean = false;
     private var lastMessage: Message? = null
     private lateinit var adapter: MessageAdapter
@@ -66,7 +76,7 @@ class MessageFragment: Fragment() {
     }
 
     private fun setUp(){
-        adapter = MessageAdapter(requireContext(), arrayListOf(), this::clicked);
+        adapter = MessageAdapter(requireContext(), arrayListOf(), this::imageClicked);
         val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         layoutManager.stackFromEnd = false
         binding.rvMessage.setLayoutManager(layoutManager)
@@ -95,8 +105,19 @@ class MessageFragment: Fragment() {
         binding.ivCam.setOnClickListener {
             val granted = PermissionHelper.checkCameraPermissions(requireContext(), requireActivity())
             if(granted){
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                startActivity(intent);
+                openCamera(requireContext())
+            }
+        }
+
+        cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val file = photoFile;
+                val channelId = arguments?.getString("channelId");
+                channelId?.let {
+                    file?.let {
+                        viewModel.sendFile(channelId!!, file);
+                    }
+                }
             }
         }
 
@@ -149,11 +170,11 @@ class MessageFragment: Fragment() {
     }
 
     private fun scrollToBottomItem(){
-        val hide = 6;
-        val lastPosition = (binding.rvMessage.adapter?.itemCount?:0) - (pageSize-hide);
         binding.rvMessage.post {
-            val y = binding.rvMessage.getChildAt(lastPosition).getY();
             binding.nestedScroll.post {
+                val hide = 3;
+                val lastPosition = (binding.rvMessage.adapter?.itemCount?:0) - (pageSize-hide);
+                val y = binding.rvMessage.getChildAt(lastPosition).getY();
                 binding.nestedScroll.fling(0)
                 binding.nestedScroll.smoothScrollTo(0, y.toInt())
             }
@@ -176,7 +197,11 @@ class MessageFragment: Fragment() {
         }
     }
 
-    private fun clicked(message: Message){}
+    private fun imageClicked(message: Message){
+        val intent = Intent(context, FullScreenActivity::class.java)
+        intent.putExtra("imagePath", message.attachments.firstOrNull()?.imageUrl)
+        startActivity(intent)
+    }
 
     private fun textChanges(){
         val textWatcher = object : TextWatcher {
@@ -191,6 +216,28 @@ class MessageFragment: Fragment() {
             }
         }
         binding.et.addTextChangedListener(textWatcher)
+    }
+
+    private fun openCamera(context: Context) {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        try {
+            photoFile = CameraHelper.createImageFile(context);
+        } catch (ex: IOException) {
+            print(ex)
+        }
+
+        photoFile?.also {
+            val photoURI: Uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider",
+                it
+            )
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+            cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            cameraResult.launch(cameraIntent)
+        }
     }
 
 }

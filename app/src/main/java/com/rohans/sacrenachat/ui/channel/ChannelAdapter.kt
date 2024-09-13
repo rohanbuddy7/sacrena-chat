@@ -1,5 +1,6 @@
 package com.loannetwork.app.ui.billingCompany.bottomsheets.state
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rohans.sacrenachat.R
 import com.rohans.sacrenachat.databinding.CardChannelBinding
 import com.rohans.sacrenachat.model.CustomChannel
+import com.rohans.sacrenachat.utils.Constants
 
 
 class ChannelAdapter(
@@ -24,9 +26,26 @@ class ChannelAdapter(
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
         holder.binding.data = data
+
+        data.lastMessage?.apply {
+            if(this.text.trim().isEmpty() && this.attachments.firstOrNull()?.imageUrl!=null){
+                if(data.lastMessage?.user?.id==Constants.aliceUserId){
+                    holder.binding.tvMsg.text = "You sent an Image";
+                } else {
+                    holder.binding.tvMsg.text = "${data.lastMessage?.user?.name} sent an Image";
+                }
+            } else {
+                holder.binding.tvMsg.text = this.text;
+            }
+        }
+
+        holder.binding.tvName.text = data.channel.members.filter {
+            it.user.id != Constants.aliceUserId
+        }.firstOrNull()?.user?.name
 
         holder.itemView.setOnClickListener {
             clicked.invoke(data)

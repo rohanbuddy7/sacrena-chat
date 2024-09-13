@@ -13,6 +13,7 @@ import io.getstream.chat.android.client.api.models.QueryChannelRequest
 import io.getstream.chat.android.client.channel.ChannelClient
 import io.getstream.chat.android.client.errors.ChatError
 import io.getstream.chat.android.client.events.NewMessageEvent
+import io.getstream.chat.android.client.events.NotificationMessageNewEvent
 import io.getstream.chat.android.client.utils.ProgressCallback
 import io.getstream.chat.android.models.Attachment
 import io.getstream.chat.android.models.Message
@@ -84,11 +85,16 @@ class MessageViewModel @Inject constructor(
                     val new = it as NewMessageEvent;
                     _newMessage.postValue(new.message);
                 }
+                "notification.message_new"->{
+                    val new = it as NotificationMessageNewEvent;
+                    _newMessage.postValue(new.message);
+                }
             }
         })
     }
 
     fun sendFile(channelId: String, imageFile: File){
+        Log.e("TAG", "sendFilexxd: ${imageFile} --> ${imageFile.length()}");
         val channelClient = chatClient.channel("messaging", channelId)
         channelClient.sendImage(
             imageFile, object : ProgressCallback {
@@ -103,17 +109,15 @@ class MessageViewModel @Inject constructor(
         ).enqueue { result ->
             if (result.isSuccess) {
                 result.map {
-                    val imageUrl = it.thumbUrl
                     val attachment = Attachment(
                         type = "image",
-                        imageUrl = imageUrl,
+                        imageUrl = it.file,
+                        mimeType = "image/jpeg",
                     )
                     val message = Message(
                         attachments = mutableListOf(attachment),
                     )
-                    channelClient.sendMessage(message).enqueue {
-
-                    }
+                    channelClient.sendMessage(message).enqueue {}
                 }
             }
         }

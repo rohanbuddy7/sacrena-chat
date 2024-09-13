@@ -4,6 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -18,6 +19,7 @@ class Utils {
             imageUrl?.let {
                 Glide.with(view.context)
                     .load(it)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(view)
             }
         }
