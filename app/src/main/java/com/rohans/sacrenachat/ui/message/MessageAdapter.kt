@@ -74,6 +74,11 @@ class MessageAdapter(
                 holder.binding.ivImage.setOnClickListener {
                     imageClicked.invoke(data)
                 }
+                if(data.attachments.isNotEmpty()){
+                    holder.binding.ivMine.visibility = View.VISIBLE
+                } else {
+                    holder.binding.ivMine.visibility = View.GONE
+                }
             }
             is ViewHolderOther->{
                 val data = list[position]
@@ -87,6 +92,11 @@ class MessageAdapter(
 
                 holder.binding.ivImage.setOnClickListener {
                     imageClicked.invoke(data)
+                }
+                if(data.attachments.isNotEmpty()){
+                    holder.binding.ivOther.visibility = View.VISIBLE
+                } else {
+                    holder.binding.ivOther.visibility = View.GONE
                 }
             }
         }

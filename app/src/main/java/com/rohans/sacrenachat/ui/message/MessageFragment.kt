@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +23,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.loannetwork.app.ui.billingCompany.bottomsheets.state.MessageAdapter
 import com.rohans.sacrenachat.R
@@ -38,6 +41,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MessageFragment: Fragment() {
 
+    private var prevPage: Int = 0;
+    private var page: Int = 0;
+    private var state: Parcelable? = null
     private var photoFile: File? = null;
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
     private var hasNext: Boolean = false;
@@ -81,7 +87,7 @@ class MessageFragment: Fragment() {
         layoutManager.stackFromEnd = false
         binding.rvMessage.setLayoutManager(layoutManager)
         binding.rvMessage.adapter = adapter;
-        binding.nestedScroll.setOnScrollChangeListener(listener);
+        //binding.nestedScroll.setOnScrollChangeListener(listener);
         binding.rvMessage.isNestedScrollingEnabled = true;
         textChanges();
 
@@ -124,17 +130,36 @@ class MessageFragment: Fragment() {
         channelId?.let {
             viewModel.getNewMessage(it);
         }
+
+        binding.rvMessage.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                if (lastVisibleItemPosition == adapter.itemCount-1 && hasNext && page!=prevPage) {
+                    prevPage = page;
+                    channelId?.let {
+                        lastMessage?.let {
+                            viewModel.getNexMessage(channelId!!, lastMessage!!, pageSize)
+                        }
+                    }
+                }
+            }
+        })
+
     }
 
     private fun observers(){
 
         viewModel.message.observe(viewLifecycleOwner, Observer {
             hasNext = it.hasNext;
-            adapter.addData(it.messages);
+            page++;
+            state = binding.rvMessage.layoutManager?.onSaveInstanceState();
+            adapter.addData(it.messages)
+            binding.rvMessage.layoutManager?.onRestoreInstanceState(state)
             if(lastMessage==null) {
                 scrollToBottom();
-            } else {
-                scrollToBottomItem();
             }
             zeroState();
             lastMessage = it.messages.lastOrNull();
@@ -148,44 +173,9 @@ class MessageFragment: Fragment() {
 
     }
 
-    var listener = object : NestedScrollView.OnScrollChangeListener{
-        override fun onScrollChange(
-            v: NestedScrollView,
-            scrollX: Int,
-            scrollY: Int,
-            oldScrollX: Int,
-            oldScrollY: Int
-        ) {
-            if (scrollY == 0) {
-                if (hasNext && lastMessage?.id!=tempLastMessage?.id ) {
-                    channelId?.let {
-                        lastMessage?.let {
-                            tempLastMessage = lastMessage!!;
-                            viewModel.getNexMessage(channelId!!, lastMessage!!, pageSize)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun scrollToBottomItem(){
-        binding.rvMessage.post {
-            binding.nestedScroll.post {
-                val hide = 3;
-                val lastPosition = (binding.rvMessage.adapter?.itemCount?:0) - (pageSize-hide);
-                val y = binding.rvMessage.getChildAt(lastPosition).getY();
-                binding.nestedScroll.fling(0)
-                binding.nestedScroll.smoothScrollTo(0, y.toInt())
-            }
-        }
-    }
-
     private fun scrollToBottom(){
         binding.rvMessage.post {
-            binding.nestedScroll.post {
-                binding.nestedScroll.smoothScrollTo(0, binding.nestedScroll.getChildAt(0).bottom)
-            }
+            binding.rvMessage.scrollToPosition(0)
         }
     }
 

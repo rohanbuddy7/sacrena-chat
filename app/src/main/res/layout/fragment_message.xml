@@ -93,24 +93,15 @@
                 android:gravity="center"
                 android:textColor="@color/col_AAAAAA"/>
 
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/nestedScroll"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_message"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
-                android:fillViewport="true">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_message"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:listitem="@layout/card_message_mine"
-                    android:orientation="vertical"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="5"
-                    /><!--android:descendantFocusability="blocksDescendants"-->
-
-            </androidx.core.widget.NestedScrollView>
+                tools:listitem="@layout/card_message_mine"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="5"
+                />
 
         </LinearLayout>
 
