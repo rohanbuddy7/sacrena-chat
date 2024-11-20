@@ -18,6 +18,10 @@ jobs:
           java-version: '17'
           distribution: "adopt"
 
+      - name: create local.properties
+        run: |
+          echo "STREAM_IO_API_KEY=${{ secrets.STREAM_IO_API_KEY }}" >> local.properties
+
       - name: Build with gradle
         run: ./gradlew build
 
